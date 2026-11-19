@@ -397,6 +397,26 @@ body.proj .stage{width:100vw;height:100vh;aspect-ratio:auto}
 <div class="pane" id="p-mc" style="display:none"></div>
 <div id="fs" class="cw"><div class="stage" id="projStage"></div></div>
 <script>
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+ * 【ここをメモ帳で編集】Firebase の設定（firebaseConfig）
+ *
+ *  Firebaseコンソール →（歯車）プロジェクトの設定 → マイアプリ →「SDK の設定と構成」→「構成」
+ *  に表示される「const firebaseConfig = { … };」を、下の3行（const firebaseConfig = { から }; まで）と
+ *  まるごと置き換えて保存してください。空のままなら、これまでどおり画面で入力します。
+ *
+ *  ※ ここに書くのは firebaseConfig だけにしてください。
+ *     保存先コレクション名・DiscordのWebhook URL は、当日それぞれの端末で入力します（運営内でだけ共有）。
+ * ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+const firebaseConfig = {
+  apiKey: "AIzaSyD8JCPFvN42pmFjcyh8xPgTu9uCrt1EUOM",
+  authDomain: "saitama1-2026.firebaseapp.com",
+  projectId: "saitama1-2026",
+  storageBucket: "saitama1-2026.firebasestorage.app",
+  messagingSenderId: "692896220696",
+  appId: "1:692896220696:web:60e24e9d5bbbb377fb656d"
+};
+/* ★★★★★★★★★★★★★★★★★★★★ 編集はここまで ★★★★★★★★★★★★★★★★★★★★ */
+
 /* ============================================================
  * 基本設定
  * ============================================================ */
@@ -463,6 +483,9 @@ if(!S||!S.T)S=SDEF();
 for(const m in MODES)S.T[m]=Object.assign(DDEF(),S.T[m]||{});
 const CFGDEF=()=>({fb:'',room:'saitama2026',auto:false,hook:'',hookAuto:false,appUrl:''});
 S.cfg=Object.assign(CFGDEF(),S.cfg||{});
+/* HTMLに書き込まれた firebaseConfig：この端末にまだ設定がなければ自動で使う */
+const PRESET_FB=(typeof firebaseConfig==='object'&&firebaseConfig&&firebaseConfig.apiKey)?JSON.stringify(firebaseConfig):'';
+if(PRESET_FB&&!S.cfg.fb){S.cfg.fb=PRESET_FB;try{localStorage[LSK]=JSON.stringify(S)}catch(x){}}
 if(S.open===undefined)S.open=true;
 /* 問題（パスワード保護時は暗号文だけを保存し、復号した問題はメモリ上にだけ持つ） */
 let QS={},KEY={};
@@ -1460,6 +1483,7 @@ function saveCfg(){
 }
 function cfgHTML(){const c=S.cfg;return`<div class="grid2">
  <div class="card"><h3>Firebase 同期（2台運用）</h3>
+  ${PRESET_FB?`<div class="small" style="color:#8fd">✓ このファイルには firebaseConfig が書き込まれています${S.cfg.fb===PRESET_FB?'（使用中）':`　<button class="sm" onclick="S.cfg.fb=PRESET_FB;SY.db=null;SY.last={};persist(false)">書き込まれた設定に戻す</button>`}。下で「保存先コレクション名」を入れて「自動同期を開始」してください。</div>`:''}
   <div class="small">firebaseConfig を貼り付けて保存 →「自動同期を開始」。○×を押すたびに自動で送受信されます。組ごとに別々に保存するので、大部屋と小部屋を別のPCで同時に進行できます（<b class="warn">同じ組を2台で操作しないでください</b>）。<br>「次に読む問題番号」「表示中の画面・組」「大会モード」は端末ごとに独立しています。</div>
   <textarea id="fbcfg" rows="5" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'>${e(c.fb)}</textarea>
   <div class="row">保存先コレクション名 <input type="text" id="fbroom" value="${e(c.room)}" style="width:180px"><span class="small">（2台で同じ名前にする）</span></div>
